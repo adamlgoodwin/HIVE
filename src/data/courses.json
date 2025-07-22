@@ -1,0 +1,5 @@
+[
+  { "id": "C101", "title": "Introduction to Physics", "instructor": "Dr. Feynman" },
+  { "id": "M202", "title": "Calculus II", "instructor": "Dr. Newton" },
+  { "id": "H303", "title": "History of Rome", "instructor": "Dr. Aurelius" }
+]
