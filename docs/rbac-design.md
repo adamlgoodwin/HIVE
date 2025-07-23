@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 # Flexible Role-Based Access Control (RBAC) Design
 
 ## 🎯 **Design Goals**

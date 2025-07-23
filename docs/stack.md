@@ -58,14 +58,20 @@
 
 **Database Schema:**
 ```sql
--- Main data table
+-- Main data table (linked-list ordering)
 CREATE TABLE courses (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   instructor TEXT NOT NULL,
-  order_index INTEGER,
+  next_course_id TEXT NULL,  -- Linked-list pointer
   created_at TIMESTAMP,
   updated_at TIMESTAMP
+);
+
+-- Linked list metadata (tracks first node)
+CREATE TABLE course_order_metadata (
+  id TEXT PRIMARY KEY DEFAULT 'main',
+  first_course_id TEXT REFERENCES courses(id)
 );
 
 -- User preferences (future multi-user)

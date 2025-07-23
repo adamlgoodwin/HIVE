@@ -14,7 +14,16 @@ export interface Course {
   id: string
   title: string
   instructor: string
-  order_index?: number
+  order_index?: number // Legacy field - will be deprecated
+  next_course_id?: string | null // Linked list pointer
+  displayOrder?: number // Frontend-only field for showing 1,2,3...
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CourseOrderMetadata {
+  id: string
+  first_course_id: string | null
   created_at?: string
   updated_at?: string
 }

@@ -129,7 +129,7 @@ function Start-DevServer {
 }
 
 function Open-Browser {
-    Write-Header "OPENING BROWSER IN WINDSURF"
+    Write-Header "OPENING WINDSURF BROWSER PREVIEW"
     
     try {
         # First detect which port the server is running on
@@ -160,20 +160,61 @@ function Open-Browser {
         $quickLoginUrl = "http://localhost:$port/quick-login"
         
         Write-Info "Server detected on port $port"
-        Write-Info "Opening Windsurf browser with console access..."
-        Write-Info "Main app: $url"
-        Write-Info "Quick login: $quickLoginUrl"
+        Write-Info "Opening Windsurf browser preview..."
+        Write-ColorOutput "Magenta" "Main app: $url"
+        Write-ColorOutput "Magenta" "Quick login: $quickLoginUrl"
         
-        Write-ColorOutput "Cyan" "TIP: In Windsurf browser you can see:"
-        Write-ColorOutput "Cyan" "  - Console logs (React errors, Supabase responses)"
-        Write-ColorOutput "Cyan" "  - Network requests (API calls to Supabase)"
-        Write-ColorOutput "Cyan" "  - Real-time debugging info"
+        # Open Windsurf browser preview using file:// protocol to trigger preview
+        Write-Info "Triggering Windsurf browser preview..."
         
-        Write-Success "Use the browser preview in Windsurf to see backend logs!"
-        Start-Sleep -Seconds 2
+        # Create a temporary file with URL to trigger browser preview
+        $tempFile = [System.IO.Path]::GetTempFileName() + ".html"
+        $htmlContent = @"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Windsurf Browser Preview</title>
+    <meta http-equiv="refresh" content="0; url=$url">
+    <script>
+        // Auto-redirect and close temp window
+        setTimeout(() => {
+            window.location.href = '$url';
+        }, 100);
+    </script>
+</head>
+<body>
+    <h2>🚀 Opening Educational App...</h2>
+    <p>Redirecting to: <a href="$url">$url</a></p>
+    <p><a href="$quickLoginUrl">Quick Login Page</a></p>
+    <script>console.log('Windsurf browser preview opened!');</script>
+</body>
+</html>
+"@
+        
+        $htmlContent | Out-File -FilePath $tempFile -Encoding UTF8
+        
+        # Open the temp file which should trigger Windsurf browser preview
+        Start-Process $tempFile
+        
+        Write-ColorOutput "Cyan" "✅ Windsurf Browser Features Available:"
+        Write-ColorOutput "Cyan" "  📊 Console logs (React errors, Supabase responses)"
+        Write-ColorOutput "Cyan" "  🔗 Network requests (API calls to Supabase)"
+        Write-ColorOutput "Cyan" "  🐛 Real-time debugging info"
+        Write-ColorOutput "Cyan" "  📱 Responsive design testing"
+        Write-ColorOutput "Cyan" "  🔍 Element inspection"
+        
+        Write-Success "Browser preview should open in Windsurf!"
+        
+        # Clean up temp file after a delay
+        Start-Sleep -Seconds 3
+        if (Test-Path $tempFile) {
+            Remove-Item $tempFile -ErrorAction SilentlyContinue
+        }
     }
     catch {
         Write-Error "Error opening browser: $($_.Exception.Message)"
+        Write-Info "Fallback: Manually use browser preview in Windsurf with URL: http://localhost:3000"
     }
 }
 
