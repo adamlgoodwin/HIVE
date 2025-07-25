@@ -21,7 +21,8 @@
     "@tabler/icons-react": "^2.47.0",
     "mantine-react-table": "^2.0.0-beta.6",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",

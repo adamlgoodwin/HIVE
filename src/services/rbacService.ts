@@ -35,14 +35,40 @@ export class RBACService {
   }
   
   static async getUserProfile(userId: string): Promise<UserProfile | null> {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
+    try {
+      console.log('🔍 getUserProfile: Querying for user:', userId);
+      
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      console.log('📊 getUserProfile result:', { data, error });
+      
+      if (error) {
+        console.error('❌ getUserProfile ERROR:', error);
+        
+        // Check if it's a specific error type
+        if (error.code === 'PGRST116') {
+          console.log('🎯 User profile not found - this is expected for new users');
+          return null;
+        }
+        
+        if (error.code === '42501') {
+          console.log('🔒 RLS Policy blocking query - check database policies');
+        }
+        
+        throw error;
+      }
+      
+      console.log('✅ getUserProfile FOUND:', data?.email);
+      return data;
+      
+    } catch (error) {
+      console.error('💥 getUserProfile FAILED:', error);
+      throw error;
+    }
   }
   
   static async updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile> {
@@ -58,47 +84,78 @@ export class RBACService {
   }
   
   static async getUserWithRoles(userId: string): Promise<UserWithRoles | null> {
-    // Get user profile
-    const profile = await this.getUserProfile(userId);
-    if (!profile) return null;
-    
-    // Get organization roles
-    const { data: roleData, error: roleError } = await supabase
-      .from('user_organization_roles')
-      .select(`
-        role,
-        is_active,
-        joined_at,
-        organization:organizations(*)
-      `)
-      .eq('user_id', userId)
-      .eq('is_active', true);
-    
-    if (roleError) throw roleError;
-    
-    // Get observer relationships
-    const { data: observerData, error: observerError } = await supabase
-      .from('observer_relationships')
-      .select(`
-        *,
-        learner:user_profiles!learner_id(*),
-        organization:organizations(*)
-      `)
-      .eq('observer_id', userId)
-      .eq('is_active', true);
-    
-    if (observerError) throw observerError;
-    
-    return {
-      profile,
-      organizations: roleData?.map(r => ({
-        organization: r.organization as any,
-        role: r.role as any,
-        is_active: r.is_active as boolean,
-        joined_at: r.joined_at as string
-      })) || [],
-      observer_relationships: observerData || []
-    };
+    try {
+      console.log('📋 Step 1: Getting user profile for:', userId);
+      console.log('🔍 User ID type:', typeof userId);
+      console.log('🔍 User ID value:', JSON.stringify(userId));
+      
+      const profile = await this.getUserProfile(userId);
+      if (!profile) {
+        console.error('❌ No user profile found for:', userId);
+        return null;
+      }
+      
+      console.log('✅ User profile found:', profile.email);
+      
+      console.log('📋 Step 2: Getting organization roles...');
+      
+      // Get organization roles
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_organization_roles')
+        .select(`
+          role,
+          is_active,
+          joined_at,
+          organization:organizations(*)
+        `)
+        .eq('user_id', userId)
+        .eq('is_active', true);
+      
+      if (roleError) {
+        console.error('❌ Role query error:', roleError);
+        throw roleError;
+      }
+      
+      console.log('✅ Organization roles found:', roleData?.length || 0, 'roles');
+      
+      console.log('📋 Step 3: Getting observer relationships...');
+      
+      // Get observer relationships
+      const { data: observerData, error: observerError } = await supabase
+        .from('observer_relationships')
+        .select(`
+          *,
+          learner:user_profiles!learner_id(*),
+          organization:organizations(*)
+        `)
+        .eq('observer_id', userId)
+        .eq('is_active', true);
+      
+      if (observerError) {
+        console.error('❌ Observer query error:', observerError);
+        throw observerError;
+      }
+      
+      console.log('✅ Observer relationships found:', observerData?.length || 0, 'relationships');
+      
+      const result = {
+        profile,
+        organizations: roleData?.map(r => ({
+          organization: r.organization as any,
+          role: r.role as any,
+          is_active: r.is_active as boolean,
+          joined_at: r.joined_at as string
+        })) || [],
+        observer_relationships: observerData || []
+      };
+      
+      console.log('🎉 Final result:', result);
+      return result;
+      
+    } catch (error) {
+      console.error('💥 getUserWithRoles failed:', error);
+      throw error;
+    }
   }
   
   // =====================================================
