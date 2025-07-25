@@ -1,5 +1,5 @@
 import { Container, Title, Text, Stack, Divider, Paper, Group, Badge } from '@mantine/core';
-import { GenericDataTable } from '../components/GenericDataTable';
+import GenericDataTable from '../components/GenericDataTable';
 import { 
   courseTableConfig, 
   courseCatalogConfig, 

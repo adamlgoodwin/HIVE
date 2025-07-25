@@ -9,7 +9,6 @@ import type {
   ObserverRelationship,
   OrganizationInvitation,
   UserRole,
-  OrganizationType,
   RelationshipType,
   UserWithRoles,
   OrganizationWithMembers,
@@ -93,10 +92,10 @@ export class RBACService {
     return {
       profile,
       organizations: roleData?.map(r => ({
-        organization: r.organization,
-        role: r.role,
-        is_active: r.is_active,
-        joined_at: r.joined_at
+        organization: r.organization as any,
+        role: r.role as any,
+        is_active: r.is_active as boolean,
+        joined_at: r.joined_at as string
       })) || [],
       observer_relationships: observerData || []
     };
@@ -136,7 +135,7 @@ export class RBACService {
       .eq('is_active', true);
     
     if (error) throw error;
-    return data?.map(r => r.organization) || [];
+    return data?.map(r => r.organization as any) || [];
   }
   
   static async getOrganizationWithMembers(orgId: string): Promise<OrganizationWithMembers | null> {
@@ -174,10 +173,10 @@ export class RBACService {
     return {
       organization,
       members: memberData?.map(m => ({
-        user: m.user,
-        role: m.role,
-        is_active: m.is_active,
-        joined_at: m.joined_at
+        user: m.user as any,
+        role: m.role as any,
+        is_active: m.is_active as boolean,
+        joined_at: m.joined_at as string
       })) || [],
       pending_invitations: invitationData || []
     };
@@ -262,7 +261,7 @@ export class RBACService {
     return {
       has_role,
       role: data?.role,
-      organization: data?.organization
+      organization: data?.organization as any
     };
   }
   
@@ -388,7 +387,7 @@ export class RBACService {
     };
   }
   
-  static async isPlatformAdmin(userId: string): Promise<boolean> {
+  static async isPlatformAdmin(_userId: string): Promise<boolean> {
     const { data, error } = await supabase
       .rpc('is_platform_admin');
     

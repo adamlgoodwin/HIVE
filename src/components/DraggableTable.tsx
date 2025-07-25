@@ -76,7 +76,7 @@ export function DraggableTable({ initialData }: DraggableTableProps) {
         backgroundColor: '#f8f9fa',
       },
     },
-    mantineTableBodyRowProps: ({ row }) => ({
+    mantineTableBodyRowProps: () => ({
       style: {
         cursor: 'grab',
         '&:hover': {

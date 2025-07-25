@@ -104,7 +104,7 @@ export function LinkedListDemo() {
                   <Text fw={600} c="blue">#{course.displayOrder}</Text>
                   <Text>{course.title || '[Blank Course]'}</Text>
                   <Text c="dimmed">{course.instructor || '[No Instructor]'}</Text>
-                  <Code size="xs">{course.id}</Code>
+                  <Code>{course.id}</Code>
                 </Group>
                 <Group>
                   <Button 

@@ -67,7 +67,7 @@ const TestingTablePage: React.FC<TestingTablePageProps> = () => {
       </Title>
       
       <Alert 
-        icon={IconAlertCircle}
+        icon={<IconAlertCircle />}
         title="Testing Framework"
         withCloseButton={false}
         color="blue"
